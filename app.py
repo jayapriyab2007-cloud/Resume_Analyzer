@@ -12,7 +12,7 @@ import google.generativeai as genai
 
 st.set_page_config(
     page_title="Resume Analyzer",
-    page_icon="e:\downloads\noun-chatbot-1596693.png",
+    page_icon="🌸",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
