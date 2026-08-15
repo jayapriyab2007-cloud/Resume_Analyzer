@@ -3,7 +3,7 @@ from pypdf import PdfReader
 from docx import Document
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-import google.generativeai as genai
+from google import genai
 
 
 # ----------------------------------------------------------------------
@@ -306,6 +306,26 @@ st.markdown(
         margin-top: 1.1rem;
     }
 
+    /* Streamlit's own markdown renderer applies theme-based (often
+       white, in dark mode) text color to headings/paragraphs/lists.
+       Since each st.markdown() call is its own DOM block, the
+       .results-body wrapper above never actually contains this
+       content — so force the color directly on Streamlit's real
+       markdown container inside the results card instead. */
+    div[class*="st-key-results_card"] div[data-testid="stMarkdownContainer"] p,
+    div[class*="st-key-results_card"] div[data-testid="stMarkdownContainer"] li,
+    div[class*="st-key-results_card"] div[data-testid="stMarkdownContainer"] span,
+    div[class*="st-key-results_card"] div[data-testid="stMarkdownContainer"] strong,
+    div[class*="st-key-results_card"] div[data-testid="stMarkdownContainer"] em {
+        color: var(--text-primary) !important;
+    }
+    div[class*="st-key-results_card"] div[data-testid="stMarkdownContainer"] h1,
+    div[class*="st-key-results_card"] div[data-testid="stMarkdownContainer"] h2,
+    div[class*="st-key-results_card"] div[data-testid="stMarkdownContainer"] h3 {
+        font-family: 'Fraunces', serif;
+        color: var(--accent-dark) !important;
+    }
+
     /* ---------- Divider ---------- */
     .soft-divider {
         border: none;
@@ -329,8 +349,7 @@ st.markdown(
 # GEMINI CONFIG
 # ----------------------------------------------------------------------
 
-genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-
+client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 
 # ----------------------------------------------------------------------
 # CORE LOGIC (unchanged behavior, same functions)
@@ -448,8 +467,10 @@ Bullet list of skills or qualifications the resume is missing.
 Bullet list of concrete improvements the candidate could make.
 """
 
-    model = genai.GenerativeModel("gemini-3.6S-flash")
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model="gemini-3.6-flash",
+        contents=prompt
+    )
     return response.text
 
 
